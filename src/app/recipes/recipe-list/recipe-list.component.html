@@ -1,1 +1,11 @@
-<recipe-item></recipe-item>
+<div class="row">
+  <div class="col-xs-12">
+    <ul class="list-group">
+        <recipe-item
+          *ngFor="let recipeEl of recipes; let i = index"
+          [recipe]="recipeEl"
+          [index]="i">
+        </recipe-item>
+    </ul>
+  </div>
+</div>
