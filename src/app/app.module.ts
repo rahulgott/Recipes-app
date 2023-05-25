@@ -13,6 +13,7 @@ import { RecipeItemComponent } from './recipes/recipe-list/recipe-item/recipe-it
 import { DropwdownTogglerDirective } from './directives/dropwdown-toggler.directive';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component';
+import { RecipesStartComponent } from './recipes/recipes-start/recipes-start.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component
     RecipeListComponent,
     RecipeItemComponent,
     DropwdownTogglerDirective,
-    RecipeEditComponent
+    RecipeEditComponent,
+    RecipesStartComponent
   ],
   imports: [
     BrowserModule,
