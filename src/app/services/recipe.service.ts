@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { Recipe } from '../models/recipe.model';
 import { ShoppingListService } from './shopping-list.service';
 import { Ingredient } from '../models/ingedient.model';
-import { Subject } from 'rxjs';
+import { Subject, map } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { UrlConstants } from '../url-constants';
 
 @Injectable({
   providedIn: 'root'
@@ -11,42 +13,20 @@ import { Subject } from 'rxjs';
 export class RecipeService {
   recipesChanged = new Subject<Recipe[]>();
 
-  private recipes: Recipe[] = [
-    {
-      name: 'Tasty Schnitzel',
-      description: 'A super-tasty Schnitzel - just awesome!',
-      imagePath: 'https://upload.wikimedia.org/wikipedia/commons/7/72/Schnitzel.JPG',
-      ingredients: [
-        {
-          name: 'Meat',
-          amount: 1,
-        },
-        {
-          name: 'French Fries',
-          amount: 20
-        }
-      ]
-    },
-    {
-      name: 'Big Fat Burger',
-      description: 'What else you need to say?',
-      imagePath: 'https://upload.wikimedia.org/wikipedia/commons/b/be/Burger_King_Angus_Bacon_%26_Cheese_Steak_Burger.jpg',
-      ingredients: [
-        {
-          name: 'Buns',
-          amount: 2,
-        },
-        {
-          name: 'Meat',
-          amount: 1
-        }
-      ]
-    }
-  ];
+  private recipes: Recipe[] = [];
 
-  constructor(private slService: ShoppingListService) { }
+  constructor(private slService: ShoppingListService, private http: HttpClient) { }
 
   getRecipes() {
+    this.http.get(UrlConstants.DB_URL + "/recipes.json").pipe(
+      map(response => {
+        this.recipes = Object.values(response)
+        return Object.values(response)
+      })
+    ).subscribe(response => {
+        this.recipesChanged.next(response)
+      }
+    )
     return this.recipes.slice();
   }
 
@@ -58,8 +38,31 @@ export class RecipeService {
     this.slService.addIngredients(ingredients)
   }
 
+  updateRecipe(index: number, newRecipe: Recipe) {
+    this.recipes[index] = newRecipe;
+    this.sendDataToServer()
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
+  addRecipe(recipe: Recipe) {
+    this.recipes.push(recipe);
+    this.sendDataToServer()
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
   deleteRecipe(id: number) {
     this.recipes.splice(id, 1)
     this.recipesChanged.next(this.recipes.slice())
+  }
+
+  sendDataToServer() {
+    this.http.put(UrlConstants.DB_URL + "/recipes.json", this.recipes).subscribe(
+      response => {
+        console.log("Data sent successfully", response)
+      },
+      error => {
+        console.error(error)
+      }
+    )
   }
 }
